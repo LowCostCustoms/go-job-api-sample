@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option go_package = "github.com/LowCostCustoms/scheduler/api";
+
+package api;
+
+import "google/api/annotations.proto";
+
+
+message JobReply {
+  string id = 1;
+  string name = 2;
+  repeated JobScheduleReply schedules = 3;
+}
+
+message JobScheduleReply {
+  string id = 1;
+  string jobId = 2;
+  string cron = 3;
+}
+
+message JobPageReply {
+  uint32 count = 1;
+  repeated JobReply items = 2;
+}
+
+message JobRequest {
+  string name = 1;
+  repeated JobScheduleRequest schedules = 2;
+}
+
+message JobScheduleRequest {
+  string cron = 1;
+}
+
+message ListJobsRequest {
+  uint32 offset = 1;
+  uint32 limit = 2;
+}
+
+message GetJobRequest {
+  string id = 1;
+}
+
+service JobService {
+  rpc ListJobs(ListJobsRequest) returns (JobPageReply) {
+    option(google.api.http) = {
+      get: "/v1/jobs"
+    };
+  }
+
+  rpc GetJob(GetJobRequest) returns (JobReply) {
+    option(google.api.http) = {
+      get: "/v1/jobs/{id}"
+    };
+  }
+
+  rpc CreateJob(JobRequest) returns (JobReply) {
+    option(google.api.http) = {
+      post: "/v1/jobs",
+      body: "*"
+    };
+  }
+}
