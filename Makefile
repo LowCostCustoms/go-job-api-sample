@@ -15,20 +15,22 @@ prerequisites:
 	@echo "Downloading dependencies ..."
 	@go get ./...
 	@echo "Installing dependencies ..."
-	@go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
-	@go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
-	@go install google.golang.org/protobuf/cmd/protoc-gen-go
-	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-	@go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
-	@go install github.com/golang/mock/mockgen
+	@go install \
+		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway \
+		github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2 \
+		google.golang.org/protobuf/cmd/protoc-gen-go \
+		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
+		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger \
+		github.com/golang/mock/mockgen \
+		github.com/google/wire/cmd/wire
 
 .PHONY: generate
 generate: prerequisites
 	@mkdir -p ${PROTO_TARGET_DIR} ${SWAGGER_DIR}
 	@echo "Generating protocol stubs ..."
 	@protoc \
-		-I proto \
-		-I third_party/googleapis \
+		-Iproto \
+		-Ithird_party/googleapis \
 		--go_out ${PROTO_TARGET_DIR} \
 		--go_opt paths=source_relative \
 		--go-grpc_out ${PROTO_TARGET_DIR} \
