@@ -86,6 +86,27 @@ func TestJobService_GetJob_InvalidJobId(t *testing.T) {
 	assert.IsType(t, &errors.GenericError[errors.BadRequestTag]{}, err)
 }
 
+func TestJobService_GetJob_NotFound(t *testing.T) {
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+
+	jobRepository := repositories_mocks.NewMockJobRepository(controller)
+	jobRepository.EXPECT().FindById(gomock.Any(), gomock.Any()).Times(1).Return(nil, nil)
+
+	jobService := services.NewJobServiceServer(jobRepository, nil, nil)
+
+	reply, err := jobService.GetJob(
+		context.Background(),
+		&api.GetJobRequest{
+			Id: uuid.New().String(),
+		},
+	)
+
+	assert.Nil(t, reply)
+	assert.NotNil(t, err)
+	assert.IsType(t, &errors.GenericError[errors.NotFoundTag]{}, err)
+}
+
 func TestJobService_ListJobs(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
